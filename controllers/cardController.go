@@ -4,9 +4,14 @@ import (
 	"net/http"
 	"test/inits"
 	"test/models"
+	"test/validators"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
+
+
+var validate *validator.Validate
 
 
 
@@ -35,12 +40,21 @@ func GetCards(c *gin.Context,) {
 }
 
 func CreateCard(c *gin.Context,) {
-
 	var req models.CreateCardInput
+
+	validate = validator.New()
+	validate.RegisterValidation("uniqueTitle", validators.UniqueTitle)
+	
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	
 	card := models.Card{Title: req.Title, Author: req.Author}
 	result := inits.DB.Create(&card)

@@ -1,6 +1,9 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
+
 
 
 type Card struct {
@@ -11,6 +14,6 @@ type Card struct {
 }
 
 type CreateCardInput struct {
-	Title string `json:"title" binding:"required"`
+	Title string `json:"title" binding:"required" validate:"uniqueTitle"`
 	Author string `json:"author" binding:"required"`
 }
